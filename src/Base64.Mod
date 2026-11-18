@@ -29,7 +29,7 @@ MODULE Base64;	(** portable *) (* ejz,  *)
 				WHILE ~R.eot & (ch <= " ") & (R.lib IS Fonts.Font) DO
 					Texts.Read(R, ch)
 				END;
-				codes[i] := decTable[ORD(ch)];
+				IF ORD(ch) < LEN(decTable) THEN codes[i] := decTable[ORD(ch)] ELSE codes[i] := -1 END;
 				ok := codes[i] >= 0; INC(i);
 				IF ok THEN
 					Texts.Read(R, ch)

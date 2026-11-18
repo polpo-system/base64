@@ -75,12 +75,22 @@ BEGIN
   Check("769 bytes decoded", Base64.DecodeText(T, 0, G) & Same(F, G))
 END Bytes;
 
+(* a character above 127 ends the Base64 text, as other characters outside it do *)
+PROCEDURE Latin1;
+VAR T: Texts.Text; W: Texts.Writer; G: Files.File;
+BEGIN
+  NEW(T); Texts.Open(T, ""); Texts.OpenWriter(W); Texts.WriteString(W, "Zm9v"); Texts.Write(W, 0E4X);
+  Texts.Append(T, W.buf); G := Files.New("");
+  Check("a character above 127", Base64.DecodeText(T, 0, G) & Same(FileOf("foo", 3), G))
+END Latin1;
+
 PROCEDURE Run*;
 BEGIN
   checks := 0; fails := 0;
   Vector("", 0, ""); Vector("f", 1, "Zg=="); Vector("fo", 2, "Zm8="); Vector("foo", 3, "Zm9v");
   Vector("foob", 4, "Zm9vYg=="); Vector("fooba", 5, "Zm9vYmE="); Vector("foobar", 6, "Zm9vYmFy");
   Bytes;
+  Latin1;
   Out.String("Base64Test: "); Out.Int(checks, 0); Out.String(" checks, "); Out.Int(fails, 0); Out.String(" failed"); Out.Ln
 END Run;
 
